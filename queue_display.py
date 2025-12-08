@@ -1,22 +1,21 @@
 import tkinter as tk
-from PIL import Image, ImageTk
 from storage import load_data
 
-BG_IMAGE_PATH = "backgrounds/89326.jpg"
-REFRESH_MS = 2000
-
-last_serving = None  # to detect changes
+REFRESH_MS = 2000  # refresh every 2 seconds
 
 
-def flash_label(label, count=0):
-    """Flash animation when now serving changes."""
-    if count < 6:
+last_serving = None  # to detect when the number changes
+
+
+def flash_now_serving(label, count=0):
+    """Flash the 'Now Serving' label a few times when number changes."""
+    if count < 6:  # 6 flashes (3 on/off cycles)
         current_color = label.cget("foreground")
-        new_color = "#ff4040" if current_color != "#ff4040" else "white"
+        new_color = "red" if current_color != "red" else "black"
         label.config(foreground=new_color)
-        label.after(250, flash_label, label, count + 1)
+        label.after(300, flash_now_serving, label, count + 1)
     else:
-        label.config(foreground="white")
+        label.config(foreground="red")  # final color
 
 
 def update_display(now_label, waiting_label):
@@ -24,35 +23,52 @@ def update_display(now_label, waiting_label):
 
     customers_list, _, now_serving = load_data()
 
-    # Flash animation when number changes
+    # Detect number change to trigger flash animation
     if now_serving != last_serving:
-        flash_label(now_label)
+        flash_now_serving(now_label)
         last_serving = now_serving
 
-    # Update now serving
-    now_label.config(text=str(now_serving) if now_serving else "--")
+    # Update "Now Serving"
+    if now_serving:
+        now_label.config(text=f"{now_serving}")
+    else:
+        now_label.config(text="--")
 
-    # Update waiting list
+    # Update waiting queue
     if customers_list:
         tickets = ", ".join(str(c.ticket) for c in customers_list)
-        waiting_label.config(text=f"Waiting: {tickets}")
+        waiting_label.config(text="Waiting: " + tickets)
     else:
         waiting_label.config(text="Waiting: None")
 
     now_label.after(REFRESH_MS, update_display, now_label, waiting_label)
 
 
-def resize_background(event, bg_label, original_img):
-    """Dynamically resize the background image while maintaining quality."""
-    w, h = event.width, event.height
-    resized = original_img.resize((w, h), Image.LANCZOS)
-    bg_image = ImageTk.PhotoImage(resized)
-    bg_label.config(image=bg_image)
-    bg_label.image = bg_image
-
-
 def main():
     root = tk.Tk()
     root.title("Queue Display")
 
-   
+
+    now_label = tk.Label(
+        root,
+        text="--",
+        font=("DS-Digital", 150),  # DIGITAL CLOCK STYLE FONT
+        fg="red",
+        pady=50
+    )
+    now_label.pack()
+
+    waiting_label = tk.Label(
+        root,
+        text="Waiting:",
+        font=("Arial", 40),
+        pady=20
+    )
+    waiting_label.pack()
+
+    update_display(now_label, waiting_label)
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    main()
