@@ -19,14 +19,14 @@ def load_data():
         customers_dict = {}
 
         for item in data.get("queue", []):
-            customer = Customer(item["name"], item["reason"])
+            customer = customer(item["name"], item["reason"])
             customer.ticket = item["ticket"]   # override auto ticket
             customers_list.append(customer)
             customers_dict[customer.ticket] = customer
 
         # Update next ticket number
         if customers_list:
-            Customer._next_ticket = max(c.ticket for c in customers_list) + 1
+            customer._next_ticket = max(c.ticket for c in customers_list) + 1
 
         return customers_list, customers_dict
 
