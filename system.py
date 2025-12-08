@@ -13,6 +13,7 @@ class QueueSystem:
             self.queue.enqueue(c)
 
         self.customers_by_ticket = customers_dict
+        self.now_serving = now_serving
 
 
     def register_customer(self, name, reason):
