@@ -31,9 +31,11 @@ class QueueSystem:
         if next_customer:
             self.now_serving = next_customer.ticket
             save_data(self.list_waiting(), self.customers_by_ticket, self.now_serving)
+            return next_customer
         else:
             self.now_serving = None
             save_data(self.list_waiting(), self.customers_by_ticket, self.now_serving)
+            return None
 
 
 
