@@ -6,7 +6,7 @@ from storage import load_data, save_data
 
 class QueueSystem:
     def __init__(self):
-        customers_list, customers_dict = load_data()
+        customers_list, customers_dict, now_serving = load_data()
 
         self.queue = Queue()
         for c in customers_list:
@@ -20,7 +20,7 @@ class QueueSystem:
         self.queue.enqueue(customer)
         self.customers_by_ticket[customer.ticket] = customer
 
-        save_data(self.list_waiting(), self.customers_by_ticket)
+        save_data(self.list_waiting(), self.customers_by_ticket, self.now_serving)
         return customer
 
 
@@ -28,11 +28,11 @@ class QueueSystem:
         next_customer = self.queue.dequeue()
 
         if next_customer:
-            save_data(self.list_waiting(), self.customers_by_ticket, next_customer.ticket)
-            return next_customer
-
-        save_data(self.list_waiting(), self.customers_by_ticket, None)
-        return None
+            self.now_serving = next_customer.ticket
+            save_data(self.list_waiting(), self.customers_by_ticket, self.now_serving)
+        else:
+            self.now_serving = None
+            save_data(self.list_waiting(), self.customers_by_ticket, self.now_serving)
 
 
 
