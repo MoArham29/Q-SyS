@@ -26,8 +26,14 @@ class QueueSystem:
 
     def call_next(self):
         next_customer = self.queue.dequeue()
-        save_data(self.list_waiting(), self.customers_by_ticket)
-        return next_customer
+
+        if next_customer:
+            save_data(self.list_waiting(), self.customers_by_ticket, next_customer.ticket)
+            return next_customer
+
+        save_data(self.list_waiting(), self.customers_by_ticket, None)
+        return None
+
 
 
     def search_by_ticket(self, ticket_number):

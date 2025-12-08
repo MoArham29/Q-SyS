@@ -1,37 +1,39 @@
-# queue_display.py
 import tkinter as tk
 from storage import load_data
 
 REFRESH_MS = 2000  # refresh every 2 seconds
 
-def format_waiting_text():
-    customers_list, _ = load_data()
+def update_display(now_label, waiting_label):
+    customers_list, _, now_serving = load_data()
+
+    # Update "Now Serving"
+    if now_serving:
+        now_label.config(text=f"Now Serving: {now_serving}")
+    else:
+        now_label.config(text="Now Serving: None")
+
+    # Update waiting queue display
     if not customers_list:
-        return "No customers waiting"
+        waiting_label.config(text="Waiting: No customers")
+    else:
+        tickets = [str(c.ticket) for c in customers_list]
+        waiting_label.config(text="Waiting: " + ", ".join(tickets))
 
-    # show ticket numbers in order
-    tickets = [str(c.ticket) for c in customers_list]
-    return "Waiting tickets:\n" + ", ".join(tickets)
-
-def update_label(label):
-    label.config(text=format_waiting_text())
-    label.after(REFRESH_MS, update_label, label)
+    now_label.after(REFRESH_MS, update_display, now_label, waiting_label)
 
 def main():
     root = tk.Tk()
     root.title("Queue Display")
 
-    label = tk.Label(
-        root,
-        text="Loading queue...",
-        font=("Arial", 32),
-        padx=40,
-        pady=40,
-        justify="center"
-    )
-    label.pack(expand=True, fill="both")
+    now_label = tk.Label(root, text="Now Serving: --",
+                         font=("Arial", 48), pady=20)
+    now_label.pack()
 
-    update_label(label)
+    waiting_label = tk.Label(root, text="Waiting: ",
+                             font=("Arial", 32), pady=20)
+    waiting_label.pack()
+
+    update_display(now_label, waiting_label)
     root.mainloop()
 
 if __name__ == "__main__":

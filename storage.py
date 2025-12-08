@@ -6,37 +6,34 @@ DATA_FILE = "queue_data.json"
 
 
 def load_data():
-    """Load queue system data from JSON."""
     if not os.path.exists(DATA_FILE):
-        return [], {}
+        return [], {}, None
 
     try:
         with open(DATA_FILE, "r") as f:
             data = json.load(f)
 
-        # Reconstruct Customer objects
         customers_list = []
         customers_dict = {}
 
         for item in data.get("queue", []):
-            customer_obj = Customer(item["name"], item["reason"])
-            customer_obj.ticket = item["ticket"]
-            customers_list.append(customer_obj)
-            customers_dict[customer_obj.ticket] = customer_obj
+            c = Customer(item["name"], item["reason"])
+            c.ticket = item["ticket"]
+            customers_list.append(c)
+            customers_dict[c.ticket] = c
 
-
-        # Update next ticket number
+        # Update next ticket
         if customers_list:
-            Customer._next_ticket = max(c.ticket for c in customers_list) + 1
+            Customer.NextTicket = max(c.ticket for c in customers_list) + 1
 
-        return customers_list, customers_dict
+        return customers_list, customers_dict, data.get("now_serving")
 
     except json.JSONDecodeError:
-        print("Error reading JSON file. Starting fresh.")
-        return [], {}
+        print("Error reading JSON, starting fresh.")
+        return [], {}, None
 
 
-def save_data(queue, customer_dict):
+def save_data(queue, customer_dict, now_serving=None):
     """Save queue system data to JSON."""
     data = {
         "queue": [
@@ -46,7 +43,8 @@ def save_data(queue, customer_dict):
                 "reason": c.reason
             }
             for c in queue
-        ]
+        ],
+        "now_serving": now_serving  
     }
 
     with open(DATA_FILE, "w") as f:
