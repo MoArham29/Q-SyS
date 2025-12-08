@@ -1,17 +1,6 @@
-
 from system import QueueSystem
 
-def print_waiting_list(system: QueueSystem):
-    waiting = system.list_waiting()
-    if not waiting:
-        print("\nNo customers currently waiting.")
-        return
-
-    print("\nWaiting customers:")
-    for customer in waiting:
-        print(f" - {customer}")
-
-def main():
+def operator_app():
     system = QueueSystem()
 
     while True:
@@ -21,7 +10,7 @@ def main():
         print("3. Search by ticket number")
         print("4. Exit")
 
-        choice = input("Enter choice: ").strip()
+        choice = input("Enter choice: ")
 
         if choice == "1":
             next_customer = system.call_next()
@@ -31,28 +20,33 @@ def main():
                 print("\nNo customers waiting in the queue.")
 
         elif choice == "2":
-            print_waiting_list(system)
+            waiting = system.list_waiting()
+            if not waiting:
+                print("\nNo customers waiting.")
+            else:
+                print("\nWaiting customers:")
+                for customer in waiting:
+                    print(f" - {customer}")
 
         elif choice == "3":
-            ticket_input = input("Enter ticket number: ").strip()
-            if not ticket_input.isdigit():
-                print("Ticket number must be a positive integer.")
+            ticket = input("Enter ticket number: ")
+
+            if not ticket.isdigit():
+                print("Ticket must be a number.\n")
                 continue
 
-            ticket = int(ticket_input)
-            customer = system.search_by_ticket(ticket)
-
-            if customer:
-                print(f"\nCustomer found: {customer}")
+            found = system.search_by_ticket(int(ticket))
+            if found:
+                print(f"\nCustomer found: {found}")
             else:
                 print("\nNo customer found with that ticket number.")
 
         elif choice == "4":
-            print("Exiting operator dashboard.")
+            print("Exiting Operator Dashboard.")
             break
 
         else:
-            print("Invalid option, please try again.")
+            print("Invalid option. Try again.")
 
 if __name__ == "__main__":
-    main()
+    operator_app()

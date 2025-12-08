@@ -1,7 +1,10 @@
+# QStructure.py
+
 class Node:
     def __init__(self, value):
         self.value = value
         self.next = None
+
 
 class Queue:
     def __init__(self):
@@ -10,9 +13,10 @@ class Queue:
         self._size = 0
 
     def enqueue(self, item):
-        """Adding to the end of the queue."""
+        """Add an item to the end of the queue."""
         new_node = Node(item)
 
+        # If queue already has elements
         if self.tail:
             self.tail.next = new_node
         else:
@@ -22,7 +26,7 @@ class Queue:
         self._size += 1
 
     def dequeue(self):
-        """Remove and send the first item in the Q."""
+        """Remove and return the first item in the queue."""
         if self.head is None:
             return None
 
@@ -36,12 +40,13 @@ class Queue:
         return removed.value
 
     def peek(self):
-        """Send first item without deleting it."""
+        """Return first item without removing it."""
         return self.head.value if self.head else None
 
     def is_empty(self):
-        """Checking if Q is empty."""
+        """Return True if queue is empty."""
         return self._size == 0
 
     def size(self):
+        """Return number of items in queue."""
         return self._size
