@@ -1,6 +1,6 @@
 import json
 import os
-from customer import customer
+from customer import Customer
 
 DATA_FILE = "queue_data.json"
 
@@ -19,14 +19,15 @@ def load_data():
         customers_dict = {}
 
         for item in data.get("queue", []):
-            customer = customer(item["name"], item["reason"])
-            customer.ticket = item["ticket"]   # override auto ticket
-            customers_list.append(customer)
-            customers_dict[customer.ticket] = customer
+            customer_obj = Customer(item["name"], item["reason"])
+            customer_obj.ticket = item["ticket"]
+            customers_list.append(customer_obj)
+            customers_dict[customer_obj.ticket] = customer_obj
+
 
         # Update next ticket number
         if customers_list:
-            customer._next_ticket = max(c.ticket for c in customers_list) + 1
+            Customer._next_ticket = max(c.ticket for c in customers_list) + 1
 
         return customers_list, customers_dict
 

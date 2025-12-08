@@ -1,5 +1,5 @@
 
-from customer import customer
+from customer import Customer
 from QStructure import Queue
 from storage import load_data, save_data
 
