@@ -1,13 +1,4 @@
 {
-    "queue": [
-        {
-            "ticket": 1,
-            "name": "mohamed",
-            "reason": "doc",
-            "phone": "",
-            "email": "arhamkalam321@gmail.com",
-            "arrival": "2025-12-09 01:15:57.978054"
-        }
-    ],
-    "now_serving": 2
+    "queue": [],
+    "now_serving": 1
 }
