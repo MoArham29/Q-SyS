@@ -6,9 +6,10 @@ DATA_FILE = "queue_data.json"
 
 
 def load_data():
-    """Load queue system data from JSON."""
+    """Load queue system data from JSON file."""
     if not os.path.exists(DATA_FILE):
-        return [], {}, None  # empty queue, empty dict, now_serving None
+        Customer.NextTicket = 1
+        return [], {}, None
 
     try:
         with open(DATA_FILE, "r") as f:
@@ -21,29 +22,33 @@ def load_data():
             c = Customer(
                 item["name"],
                 item["reason"],
-                item["phone"],
-                item["email"]
+                item.get("phone", ""),   # safe fallback
+                item.get("email", "")    # safe fallback
             )
-            c.ticket = item["ticket"]              # Override auto-ticketing
-            c.arrival = item["arrival"]            # stored timestamp string
+            c.ticket = item["ticket"]
+            c.arrival = item["arrival"]   # stored timestamp (string)
+
             customers_list.append(c)
             customers_dict[c.ticket] = c
 
-        # Update NextTicket to match last used ticket +1
+        # Update ticket counter
         if customers_list:
             Customer.NextTicket = max(c.ticket for c in customers_list) + 1
+        else:
+            Customer.NextTicket = 1
 
-        now_serving = data.get("now_serving", None)
+        now_serving = data.get("now_serving")
 
         return customers_list, customers_dict, now_serving
 
     except json.JSONDecodeError:
-        print("Corrupted JSON file. Starting fresh.")
+        print("Error: queue_data.json is corrupted. Resetting system.")
+        Customer.NextTicket = 1
         return [], {}, None
 
 
 def save_data(queue_list, customers_dict, now_serving):
-    """Save queue system data to JSON."""
+    """Save queue system data into JSON file."""
     data = {
         "queue": [
             {

@@ -1,7 +1,7 @@
 from customer import Customer
 from QStructure import Queue
 from storage import load_data, save_data
-from notifications import notify_customer, send_sms
+from notifications import notify_customer
 
 
 class QueueSystem:
@@ -23,38 +23,41 @@ class QueueSystem:
         self.queue.enqueue(customer)
         self.customers_by_ticket[customer.ticket] = customer
 
+        # Send confirmation email only
+        notify_customer(customer.email, customer.ticket)
+
         # Save updated data
         save_data(self.list_waiting(), self.customers_by_ticket, self.now_serving)
-
-        # Send SMS + Email confirmation
-        notify_customer(customer.email, customer.phone, customer.ticket)
 
         return customer
 
 
     def call_next(self):
-        """Serve the next customer and notify them by SMS."""
+        """Serve the next customer and send email notification."""
         next_customer = self.queue.dequeue()
 
         if next_customer:
             self.now_serving = next_customer.ticket
-            save_data(self.list_waiting(), self.customers_by_ticket, self.now_serving)
 
-            # SMS alert
-            send_sms(
-                next_customer.phone,
-                f"Your number {next_customer.ticket} is now being served."
+            # Send email to notify customer
+            from notifications import send_email
+            subject = "Your Queue Number is Being Served"
+            msg = (
+                f"Hello {next_customer.name},\n\n"
+                f"Your ticket number {next_customer.ticket} is now being served.\n"
+                "Please proceed to the counter.\n"
             )
-
-            return next_customer
+            send_email(next_customer.email, subject, msg)
 
         else:
             self.now_serving = None
-            save_data(self.list_waiting(), self.customers_by_ticket, self.now_serving)
-            return None
+
+        save_data(self.list_waiting(), self.customers_by_ticket, self.now_serving)
+        return next_customer
 
 
     def search_by_ticket(self, ticket_number):
+        """Return a customer object if found."""
         return self.customers_by_ticket.get(ticket_number)
 
 
