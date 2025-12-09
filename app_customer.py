@@ -13,19 +13,18 @@ def customer_app():
         if choice == "1":
             name = input("Enter your name: ")
             reason = input("Reason for visit: ")
+            phone = input("Enter your phone number (e.g. +447...): ")
+            email = input("Enter your email: ")
 
-            if not name.strip():
-                print("Name is required.\n")
-                continue
-            if not reason.strip():
-                print("Reason is required.\n")
+            if not name.strip() or not reason.strip() or not phone.strip() or not email.strip():
+                print("\nAll fields are required.\n")
                 continue
 
-            customer = system.register_customer(name, reason)
+            customer = system.register_customer(name, reason, phone, email)
 
             print("\nRegistration Successful!")
             print(f"Your ticket number is: {customer.ticket}")
-            print("Please wait until your number is called.\n")
+            print("You will receive SMS + Email confirmation.\n")
 
         elif choice == "2":
             print("Goodbye!")
@@ -33,6 +32,7 @@ def customer_app():
 
         else:
             print("Invalid option. Try again.")
+
 
 if __name__ == "__main__":
     customer_app()
